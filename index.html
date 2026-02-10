@@ -3,12 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My App</title>
+  <title>Oslo Guide</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+  
 <body>
   <header>Overview</header>
-  <main id="content"></main>
+  <main id="content">
+
+    <div id="restaurant-list"></div>
+
+    <script>
+    async function showRestaurants() {
+      const rows = await getSheetData();
+      const headers = rows[0]; // first row = headers
+      const data = rows.slice(1); // all other rows
+
+      const listDiv = document.getElementById("restaurant-list");
+
+      data.forEach((row, index) => {
+        const item = document.createElement("div");
+        item.textContent = row[0]; // assume column 0 = restaurant name
+        item.style.cursor = "pointer";
+        item.style.margin = "5px 0";
+    
+        // When clicked, go to detail page
+        item.onclick = () => {
+          const params = new URLSearchParams();
+          headers.forEach((header, i) => {
+            params.set(header, row[i]);
+          });
+          window.location.href = `restaurant.html?${params.toString()}`;
+        };
+
+        listDiv.appendChild(item);
+      });
+    }
+
+    showRestaurants();
+    </script>
+    
+  </main>
   <script src="app.js"></script>
 </body>
 </html>
