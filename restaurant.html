@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restaurant Details</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .detail { margin: 10px 0; }
+    button { margin-top: 20px; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+
+<h1>Restaurant Details</h1>
+<div id="restaurant-details">Loading...</div>
+<button onclick="history.back()">Back</button>
+
+<script>
+  function showDetails() {
+    const params = new URLSearchParams(window.location.search); // Read URL parameters
+    const detailsDiv = document.getElementById("restaurant-details");
+    detailsDiv.innerHTML = ""; // Clear loading text
+
+    // Loop through all parameters and display them
+    params.forEach((value, key) => {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "detail";
+      rowDiv.innerHTML = `<strong>${key}:</strong> ${value}`; // Show header and value
+      detailsDiv.appendChild(rowDiv);
+    });
+  }
+
+  // Run on page load
+  showDetails();
+</script>
+
+</body>
+</html>
