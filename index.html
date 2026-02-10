@@ -1,49 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Oslo Guide</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <title>Restaurant List</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .restaurant { cursor: pointer; margin: 5px 0; padding: 5px; border-bottom: 1px solid #ccc; }
+    .restaurant:hover { background-color: #f0f0f0; }
+  </style>
 </head>
-  
 <body>
-  <header>Overview</header>
-  <main id="content">
 
-    <div id="restaurant-list"></div>
+<h1>Restaurants</h1>
+<div id="restaurant-list">Loading...</div>
 
-    <script>
-    async function showRestaurants() {
-      const rows = await getSheetData();
-      const headers = rows[0]; // first row = headers
-      const data = rows.slice(1); // all other rows
+<script>
+  // --- Config ---
+  const SPREADSHEET_ID = "YOUR_SPREADSHEET_ID"; // Replace with your sheet ID
+  const API_KEY = "YOUR_API_KEY"; // Replace with your Google Sheets API key
+  const SHEET_NAME = "Restaurants"; // Tab name in your spreadsheet
 
-      const listDiv = document.getElementById("restaurant-list");
+  // --- Function to fetch data from Google Sheets ---
+  async function getSheetData() {
+    // Fetch data using Google Sheets API
+    const response = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`
+    );
+    const data = await response.json();
+    return data.values; // Returns array of arrays: each row is an array
+  }
 
-      data.forEach((row, index) => {
-        const item = document.createElement("div");
-        item.textContent = row[0]; // assume column 0 = restaurant name
-        item.style.cursor = "pointer";
-        item.style.margin = "5px 0";
-    
-        // When clicked, go to detail page
-        item.onclick = () => {
-          const params = new URLSearchParams();
-          headers.forEach((header, i) => {
-            params.set(header, row[i]);
-          });
-          window.location.href = `restaurant.html?${params.toString()}`;
-        };
+  // --- Function to display restaurants ---
+  async function showRestaurants() {
+    const rows = await getSheetData(); // Get all data
+    const headers = rows[0]; // First row = column names
+    const data = rows.slice(1); // Remaining rows = restaurant entries
 
-        listDiv.appendChild(item);
-      });
-    }
+    const listDiv = document.getElementById("restaurant-list");
+    listDiv.innerHTML = ""; // Clear loading text
 
-    showRestaurants();
-    </script>
-    
-  </main>
-  <script src="app.js"></script>
+    data.forEach((row) => {
+      const item = document.createElement("div"); // Create a div for each restaurant
+      item.className = "restaurant";
+      item.textContent = row[0]; // row[0] = Name column
+
+      // When clicked, go to detail page with data in URL
+      item.onclick = () => {
+        const params = new URLSearchParams();
+        headers.forEach((header, i) => {
+          params.set(header, row[i]); // Pass each column as a URL parameter
+        });
+        window.location.href = `restaurant.html?${params.toString()}`; // Navigate
+      };
+
+      listDiv.appendChild(item); // Add restaurant to list
+    });
+  }
+
+  // Run on page load
+  showRestaurants();
+</script>
+
 </body>
 </html>
